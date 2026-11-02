@@ -90,7 +90,7 @@ export function progressColor(window: QuotaWindow): string {
     return '#4A4A4A';
   }
   if (ratio <= 0.1) {
-    return '#E84026';
+    return '#F0523A';
   }
   if (ratio <= 0.3) {
     return '#F2A33C';

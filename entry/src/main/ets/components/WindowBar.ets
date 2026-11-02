@@ -21,7 +21,7 @@ export struct WindowBar {
           .layoutWeight(1)
         Text(this.valueText())
           .fontSize(13)
-          .fontColor(this.isUnavailable() ? '#6B6B6B' : '#E8E8EA')
+          .fontColor(this.isUnavailable() ? '#8A8A8E' : '#E8E8EA')
           .fontWeight(FontWeight.Medium)
       }
       .width('100%')
@@ -29,7 +29,7 @@ export struct WindowBar {
       if (this.isUnavailable()) {
         Text(this.window.unavailableReason ?? '无数据')
           .fontSize(11)
-          .fontColor('#6B6B6B')
+          .fontColor('#8A8A8E')
           .width('100%')
           .maxLines(1)
           .textOverflow({ overflow: TextOverflow.Ellipsis })
@@ -78,7 +78,7 @@ export struct WindowBar {
     if (ratio === undefined) {
       return '—';
     }
-    return `${Math.round(ratio * 100)}%`;
+    return `剩余 ${Math.round(ratio * 100)}%`;
   }
 
   private subText(): string {

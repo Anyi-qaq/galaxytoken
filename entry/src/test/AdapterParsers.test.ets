@@ -60,9 +60,27 @@ export default function adapterParsersTest() {
 
   describe('glm', () => {
     it('unit_enum_maps_3_to_5h_and_6_to_week', 0, () => {
-      // cc-switch 实测：unit 3 = 5 小时滚动窗口，unit 6 = 每周窗口。
+      // 依据智谱官方开源仓库 zai-org/ZCode（Apache-2.0）：
+      //   packages/ui/src/CodingPlanUsageRemainingPanel.tsx:261-263
+      //     findCodingPlanQuotaLimit(limits, "TOKENS_LIMIT", 3, 5) → 5 小时
+      //     findCodingPlanQuotaLimit(limits, "TOKENS_LIMIT", 6)    → 每周
+      //   packages/ui/src/lib/codingPlanQuotaPresentation.ts:8-13 注释亦明确此对应。
       expect(glmWindowKind(3)).assertEqual(WindowKind.H5);
       expect(glmWindowKind(6)).assertEqual(WindowKind.WEEK);
+    });
+
+    it('percentage_is_used_ratio_not_remaining', 0, () => {
+      // 官方 codingPlanQuotaPresentation.ts:79-81 明确：quota 接口的 percentage
+      // 是「已使用占比」，展示时才反转成剩余。这里验证我们的取值方向一致。
+      const usedPercent = 37.5;
+      const window: QuotaWindow = {
+        kind: WindowKind.H5,
+        mode: QuotaMode.RATIO,
+        usedRatio: usedPercent / 100
+      };
+      expect(window.usedRatio).assertEqual(0.375);
+      const left = remainingRatio(window);
+      expect(left !== undefined && Math.abs(left - 0.625) < 0.0001).assertTrue();
     });
 
     it('unknown_unit_is_rejected', 0, () => {

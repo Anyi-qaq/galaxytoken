@@ -127,7 +127,7 @@ export default class QuotaFormAbility extends FormExtensionAbility {
       'headlineValue': '—',
       'headlinePercent': 0,
       'headlineReset': '',
-      'headlineColor': '#6B6B70',
+      'headlineColor': '#9A9A9E',
       'rowCount': 0,
       'row1': '',
       'row2': '',
@@ -148,7 +148,7 @@ export function buildBindingData(snapshot: DashboardSnapshot): Record<string, Ob
     data['headlineValue'] = '—';
     data['headlinePercent'] = 0;
     data['headlineReset'] = '';
-    data['headlineColor'] = '#6B6B70';
+    data['headlineColor'] = '#9A9A9E';
   } else {
     const ratio = remainingRatio(tightest.window);
     const percent = ratio === undefined ? 0 : Math.round(ratio * 100);
@@ -157,7 +157,7 @@ export function buildBindingData(snapshot: DashboardSnapshot): Record<string, Ob
     data['headlineValue'] = `${percent}%`;
     data['headlinePercent'] = percent;
     data['headlineReset'] = countdown(tightest.window.resetAt, snapshot.refreshedAt);
-    data['headlineColor'] = percent <= 10 ? '#E84026' : (percent <= 30 ? '#F2A33C' : '#3BA55D');
+    data['headlineColor'] = percent <= 10 ? '#F0523A' : (percent <= 30 ? '#F2A33C' : '#3BA55D');
   }
 
   const rows: string[] = [];

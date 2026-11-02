@@ -173,16 +173,16 @@ export class GlmAdapter implements SourceAdapter {
     id: 'glm',
     name: '智谱 GLM Coding Plan',
     kind: SourceKind.SUBSCRIPTION,
-    summary: 'GLM Coding Plan 的 5 小时与每周窗口。',
-    supports: { h5: true, week: true, month: false },
+    summary: 'GLM Coding Plan 的 5 小时、每周与每月工具配额。',
+    supports: { h5: true, week: true, month: true },
     credentialFields: [
       {
         key: 'apiKey',
         label: 'API Key',
         kind: FieldKind.SECRET,
         required: true,
-        placeholder: '不含 Bearer 前缀',
-        helpText: '直接填 Key 原文，接口使用裸 Authorization 头。'
+        placeholder: '粘贴 Key 原文即可',
+        helpText: '按智谱官方 ZCode 的实现，Authorization 使用 Bearer 前缀；未带时自动补上。'
       },
       {
         key: 'organization',
@@ -221,7 +221,7 @@ export class GlmAdapter implements SourceAdapter {
     defaultBaseUrl: 'https://open.bigmodel.cn',
     experimental: false,
     usesBrowserSession: false,
-    apiNote: 'GET /api/monitor/usage/quota/limit；unit 枚举 3=5h、6=周。'
+    apiNote: 'GET /api/monitor/usage/quota/limit；TOKENS_LIMIT(unit=3,number=5)=5 小时、TOKENS_LIMIT(unit=6)=每周、TIME_LIMIT(unit=5,number=1)=每月工具配额。语义依据智谱官方开源仓库 zai-org/ZCode。'
   };
 
   async fetch(context: FetchContext): Promise<ProviderSnapshot> {
@@ -231,9 +231,12 @@ export class GlmAdapter implements SourceAdapter {
     const planType = context.plain['planType'] === undefined ? '个人' : context.plain['planType'];
     const base = site === '国际' ? Endpoints.GLM_INTL_QUOTA : Endpoints.GLM_CN_QUOTA;
     const query = planType === '团队' ? '?type=2' : '?type=1';
+    // 智谱官方 ZCode 的做法：未带 Bearer 时自动补。
+    const authValue = /^Bearer\s/i.test(apiKey) ? apiKey : `Bearer ${apiKey}`;
     const headers: Record<string, string> = {
-      'Authorization': apiKey,
-      'Accept': 'application/json'
+      'Authorization': authValue,
+      'Accept': 'application/json',
+      'Accept-Language': 'zh-CN,zh;q=0.9'
     };
     const org = context.plain['organization'];
     const project = context.plain['project'];
@@ -243,7 +246,7 @@ export class GlmAdapter implements SourceAdapter {
     if (project !== undefined && project.trim() !== '') {
       headers['bigmodel-project'] = project.trim();
     }
-    const result = await HttpClient.get(`${base}${query}`, headers, [apiKey]);
+    const result = await HttpClient.get(`${base}${query}`, headers, [apiKey, authValue]);
     const root = asObject(result.json);
     if (root === undefined) {
       throw new Error('响应不是合法 JSON');
@@ -258,31 +261,25 @@ export class GlmAdapter implements SourceAdapter {
       throw new Error('响应中没有 limits 数组');
     }
     const windows: QuotaWindow[] = [];
-    for (const item of list) {
-      const row = asObject(item);
+    const specs: GlmWindowSpec[] = GLM_WINDOW_SPECS;
+    for (const spec of specs) {
+      const row = findGlmLimit(list, spec);
       if (row === undefined) {
-        continue;
-      }
-      const unit = toNum(row['unit']);
-      const kind = glmWindowKind(unit);
-      if (kind === undefined) {
-        continue;
-      }
-      if (windows.some((w: QuotaWindow) => w.kind === kind)) {
+        windows.push(unavailableWindow(spec.kind, `响应中没有${spec.label}额度条目`));
         continue;
       }
       const percentage = toNum(row['percentage']);
       if (percentage === undefined) {
+        windows.push(unavailableWindow(spec.kind, `${spec.label}条目缺少 percentage 字段`));
         continue;
       }
-      const resetAt = toEpochMs(row['nextResetTime']);
-      const ratio = percentage > 1 ? percentage / 100 : percentage;
-      windows.push(ratioWindow(kind, ratio, resetAt));
+      // 官方语义：percentage 是「已用占比」，0..100。
+      const usedRatio = clampRatio(percentage > 1 ? percentage / 100 : percentage);
+      windows.push(ratioWindow(spec.kind, usedRatio, toEpochMs(row['nextResetTime'])));
     }
-    if (windows.length === 0) {
-      throw new Error('没有识别到 5 小时或每周窗口（unit 枚举可能已变化）');
+    if (windows.every((w: QuotaWindow) => w.unavailableReason !== undefined)) {
+      throw new Error('没有识别到任何额度窗口（type/unit 枚举可能已变化）');
     }
-    windows.push(unavailableWindow(WindowKind.MONTH, 'GLM Coding Plan 不提供月度窗口'));
     return {
       providerId: this.descriptor.id,
       name: this.descriptor.name,
@@ -297,7 +294,82 @@ export class GlmAdapter implements SourceAdapter {
   }
 }
 
-/** unit 枚举：3=5 小时、6=周；其他值一律不猜。 */
+/**
+ * 一个 GLM 额度窗口的匹配条件。
+ *
+ * 全部取自智谱官方开源仓库 zai-org/ZCode（Apache-2.0）：
+ *   packages/ui/src/CodingPlanUsageRemainingPanel.tsx:261-263
+ *     findCodingPlanQuotaLimit(limits, "TOKENS_LIMIT", 3, 5)   → 5 小时
+ *     findCodingPlanQuotaLimit(limits, "TOKENS_LIMIT", 6)      → 每周
+ *     findCodingPlanQuotaLimit(limits, "TIME_LIMIT", 5, 1)     → 每月工具配额
+ * 且 packages/ui/src/lib/codingPlanQuotaPresentation.ts:8-13 的注释明确写着
+ * 「unit=3,number=5 → 5 小时窗口；unit=6 → 每周」。
+ */
+interface GlmWindowSpec {
+  kind: WindowKind;
+  label: string;
+  /** 主 type；z.ai 团队套餐用 CREDIT_LIMIT，与 TOKENS_LIMIT 等价。 */
+  type: string;
+  /** 等价的 type 集合。 */
+  altTypes: string[];
+  unit: number;
+  /** 可选的 number 精确匹配；undefined 表示该 type 下不看 number。 */
+  number?: number;
+}
+
+const GLM_WINDOW_SPECS: GlmWindowSpec[] = [
+  {
+    kind: WindowKind.H5,
+    label: '5 小时',
+    type: 'TOKENS_LIMIT',
+    altTypes: ['CREDIT_LIMIT'],
+    unit: 3,
+    number: 5
+  },
+  {
+    kind: WindowKind.WEEK,
+    label: '每周',
+    type: 'TOKENS_LIMIT',
+    altTypes: ['CREDIT_LIMIT'],
+    unit: 6
+  },
+  {
+    kind: WindowKind.MONTH,
+    label: '每月工具',
+    type: 'TIME_LIMIT',
+    altTypes: [],
+    unit: 5,
+    number: 1
+  }
+];
+
+/** 在 limits[] 中按 spec 找第一条匹配项。 */
+function findGlmLimit(list: Object[], spec: GlmWindowSpec): Record<string, Object> | undefined {
+  for (const item of list) {
+    const row = asObject(item);
+    if (row === undefined) {
+      continue;
+    }
+    const type = toStr(row['type']);
+    if (type === undefined) {
+      continue;
+    }
+    const typeOk = type === spec.type || spec.altTypes.indexOf(type) >= 0;
+    if (!typeOk) {
+      continue;
+    }
+    if (toNum(row['unit']) !== spec.unit) {
+      continue;
+    }
+    if (spec.number !== undefined && toNum(row['number']) !== spec.number) {
+      continue;
+    }
+    return row;
+  }
+  return undefined;
+}
+
+/** 兼容旧调用名：unit 枚举 3=5 小时、6=周（不含 type 过滤）。 */
 export function glmWindowKind(unit: number | undefined): WindowKind | undefined {
   if (unit === 3) {
     return WindowKind.H5;

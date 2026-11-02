@@ -118,7 +118,7 @@ struct SettingsPage {
       if (!this.metrics.sideNav) {
         Button('返回')
           .fontSize(13)
-          .height(32)
+          .height(36)
           .backgroundColor('#242428')
           .fontColor('#D8D8DC')
           .onClick(() => {
@@ -154,10 +154,19 @@ struct SettingsPage {
         ForEach(REFRESH_OPTIONS, (seconds: number) => {
           Text(this.intervalLabel(seconds))
             .fontSize(12)
+            .fontWeight(this.settings.refreshIntervalSec === seconds ? FontWeight.Medium : FontWeight.Normal)
             .fontColor(this.settings.refreshIntervalSec === seconds ? '#FFFFFF' : '#9A9A9E')
-            .backgroundColor(this.settings.refreshIntervalSec === seconds ? '#3478F6' : '#242428')
-            .padding({ left: 12, right: 12, top: 6, bottom: 6 })
-            .borderRadius(8)
+            .backgroundColor(this.settings.refreshIntervalSec === seconds ? '#2D66D8' : '#242428')
+            .padding({ left: 14, right: 14, top: 9, bottom: 9 })
+            .borderRadius(9)
+            .border({
+              width: 1,
+              color: this.settings.refreshIntervalSec === seconds ? '#FFFFFF' : '#00000000'
+            })
+            .focusable(true)
+            .hoverEffect(HoverEffect.Highlight)
+            .accessibilityText(this.settings.refreshIntervalSec === seconds
+              ? `${this.intervalLabel(seconds)}，已选中` : this.intervalLabel(seconds))
             .onClick(() => {
               this.updateInterval(seconds);
             })
@@ -166,7 +175,7 @@ struct SettingsPage {
       .width('100%')
       Text('页面在前台时按此间隔自动刷新；退到后台会停止，避免空耗流量。')
         .fontSize(10)
-        .fontColor('#5C5C60')
+        .fontColor('#8A8A8E')
         .width('100%')
     }
     .width('100%')
@@ -183,10 +192,19 @@ struct SettingsPage {
         ForEach([0, 2, 4], (decimals: number) => {
           Text(`${decimals} 位`)
             .fontSize(12)
+            .fontWeight(this.settings.moneyDecimals === decimals ? FontWeight.Medium : FontWeight.Normal)
             .fontColor(this.settings.moneyDecimals === decimals ? '#FFFFFF' : '#9A9A9E')
-            .backgroundColor(this.settings.moneyDecimals === decimals ? '#3478F6' : '#242428')
-            .padding({ left: 12, right: 12, top: 6, bottom: 6 })
-            .borderRadius(8)
+            .backgroundColor(this.settings.moneyDecimals === decimals ? '#2D66D8' : '#242428')
+            .padding({ left: 14, right: 14, top: 9, bottom: 9 })
+            .borderRadius(9)
+            .border({
+              width: 1,
+              color: this.settings.moneyDecimals === decimals ? '#FFFFFF' : '#00000000'
+            })
+            .focusable(true)
+            .hoverEffect(HoverEffect.Highlight)
+            .accessibilityText(this.settings.moneyDecimals === decimals
+              ? `${decimals} 位，已选中` : `${decimals} 位`)
             .onClick(() => {
               this.updateDecimals(decimals);
             })
@@ -208,7 +226,7 @@ struct SettingsPage {
         Text('清除快照缓存').fontSize(12).fontColor('#9A9A9E').layoutWeight(1)
         Button('清除')
           .fontSize(12)
-          .height(28)
+          .height(34)
           .backgroundColor('#2A2A2E')
           .fontColor('#E8E8EA')
           .onClick(() => {
@@ -218,7 +236,7 @@ struct SettingsPage {
       .width('100%')
       Text('凭据存放在系统密钥库，不随缓存清理删除；要删除请在该来源的编辑页重新保存。')
         .fontSize(10)
-        .fontColor('#5C5C60')
+        .fontColor('#8A8A8E')
         .width('100%')
     }
     .width('100%')
@@ -241,10 +259,10 @@ struct SettingsPage {
             .textOverflow({ overflow: TextOverflow.Ellipsis })
           Text(this.supportText(descriptor))
             .fontSize(10)
-            .fontColor('#6B6B70')
+            .fontColor('#9A9A9E')
           if (descriptor.experimental) {
             Text('实验')
-              .fontSize(9)
+              .fontSize(10)
               .fontColor('#F2A33C')
               .backgroundColor('#3A2A12')
               .padding({ left: 5, right: 5, top: 1, bottom: 1 })
@@ -271,7 +289,7 @@ struct SettingsPage {
         .width('100%')
       Text('多来源 AI 额度看板：订阅型的 5 小时 / 本周 / 本月窗口，以及标准 API 账户余额。')
         .fontSize(11)
-        .fontColor('#6B6B70')
+        .fontColor('#9A9A9E')
         .width('100%')
       Divider().color('#2C2C30')
       Text('已知限制')
@@ -281,7 +299,7 @@ struct SettingsPage {
       ForEach(this.limitations(), (line: string) => {
         Text(`· ${line}`)
           .fontSize(10)
-          .fontColor('#6B6B70')
+          .fontColor('#9A9A9E')
           .width('100%')
       }, (line: string, index: number) => `limit-${index}`)
     }
@@ -367,8 +385,8 @@ struct SettingsPage {
       'DeepSeek、Kimi、OpenRouter 的余额接口有官方文档；其余为长期稳定的公开接口。',
       'OpenRouter 必须用 Management Key，普通推理 Key 会返回 403。',
       'Novita 的金额单位是 0.0001 USD，已自动换算成美元。',
-      '套餐类来源不提供月度窗口，卡片里会写明「不提供」而不是留空。',
       'Kimi Code 新套餐已取消每周上限，只显示 5 小时滚动窗口。',
+      'GLM 的窗口语义依据智谱官方开源仓库 zai-org/ZCode：TOKENS_LIMIT(unit=3,number=5) 为 5 小时、unit=6 为每周、TIME_LIMIT(unit=5,number=1) 为每月工具配额。',
       'GLM 团队套餐需要 Organization ID 与 Project ID 两个上下文头。',
       '桌面卡片最快 30 分钟刷新一次，秒级实时依赖应用在前台运行。',
       '不做汇率换算，多币种分行展示。'

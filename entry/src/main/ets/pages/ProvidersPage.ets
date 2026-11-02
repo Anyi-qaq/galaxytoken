@@ -110,7 +110,7 @@ struct ProvidersPage {
       if (!this.metrics.sideNav) {
         Button('返回')
           .fontSize(13)
-          .height(32)
+          .height(36)
           .backgroundColor('#242428')
           .fontColor('#D8D8DC')
           .onClick(() => {
@@ -124,8 +124,8 @@ struct ProvidersPage {
         .layoutWeight(1)
       Button('添加')
         .fontSize(13)
-        .height(32)
-        .backgroundColor('#3478F6')
+        .height(36)
+        .backgroundColor('#2D66D8')
         .fontColor('#FFFFFF')
         .bindMenu(this.addMenu())
     }
@@ -141,7 +141,7 @@ struct ProvidersPage {
   @Builder
   loadingView() {
     Column() {
-      LoadingProgress().width(32).height(32).color('#6B6B70')
+      LoadingProgress().width(32).height(32).color('#9A9A9E')
     }
     .width('100%')
     .layoutWeight(1)
@@ -160,7 +160,7 @@ struct ProvidersPage {
       ListItem() {
         Text('未启用的来源不会发起任何网络请求。')
           .fontSize(11)
-          .fontColor('#5C5C60')
+          .fontColor('#8A8A8E')
           .width('100%')
           .padding({ top: 10, bottom: 24 })
       }
@@ -182,11 +182,11 @@ struct ProvidersPage {
           Row({ space: 6 }) {
             Text(this.nameOf(config))
               .fontSize(15)
-              .fontColor('#F0F0F2')
+              .fontColor('#F2F2F4')
               .fontWeight(FontWeight.Medium)
             if (this.isExperimental(config)) {
               Text('实验')
-                .fontSize(9)
+                .fontSize(10)
                 .fontColor('#F2A33C')
                 .backgroundColor('#3A2A12')
                 .padding({ left: 5, right: 5, top: 1, bottom: 1 })
@@ -194,7 +194,7 @@ struct ProvidersPage {
             }
             if (this.needsAuth(config)) {
               Text('待配置')
-                .fontSize(9)
+                .fontSize(10)
                 .fontColor('#7AA2F7')
                 .backgroundColor('#17233A')
                 .padding({ left: 5, right: 5, top: 1, bottom: 1 })
@@ -203,7 +203,7 @@ struct ProvidersPage {
           }
           Text(this.summaryOf(config))
             .fontSize(11)
-            .fontColor('#6B6B70')
+            .fontColor('#9A9A9E')
             .maxLines(2)
             .textOverflow({ overflow: TextOverflow.Ellipsis })
         }
@@ -211,7 +211,8 @@ struct ProvidersPage {
         .layoutWeight(1)
 
         Toggle({ type: ToggleType.Switch, isOn: config.enabled })
-          .selectedColor('#3478F6')
+          .selectedColor('#2D66D8')
+          .accessibilityText(`启用 ${this.nameOf(config)}`)
           .onChange((isOn: boolean) => {
             this.toggle(config.providerId, isOn);
           })
@@ -221,7 +222,7 @@ struct ProvidersPage {
       Row({ space: 8 }) {
         Button('编辑')
           .fontSize(11)
-          .height(26)
+          .height(34)
           .backgroundColor('#2A2A2E')
           .fontColor('#C8C8CC')
           .onClick(() => {
@@ -230,7 +231,7 @@ struct ProvidersPage {
         if (config.enabled) {
           Button(this.testing === config.providerId ? '测试中…' : '测试')
             .fontSize(11)
-            .height(26)
+            .height(34)
             .backgroundColor('#2A2A2E')
             .fontColor('#C8C8CC')
             .enabled(this.testing !== config.providerId)
@@ -241,9 +242,9 @@ struct ProvidersPage {
         if (ProviderRegistry.isCustom(config.providerId)) {
           Button('删除')
             .fontSize(11)
-            .height(26)
-            .backgroundColor('#3A1A16')
-            .fontColor('#E84026')
+            .height(34)
+            .backgroundColor('#2B0F0B')
+            .fontColor('#F0523A')
             .onClick(() => {
               this.removeCustom(config.providerId);
             })
@@ -251,7 +252,7 @@ struct ProvidersPage {
         Blank()
         Button('上移')
           .fontSize(11)
-          .height(26)
+          .height(34)
           .backgroundColor('#2A2A2E')
           .fontColor('#C8C8CC')
           .onClick(() => {
@@ -259,7 +260,7 @@ struct ProvidersPage {
           })
         Button('下移')
           .fontSize(11)
-          .height(26)
+          .height(34)
           .backgroundColor('#2A2A2E')
           .fontColor('#C8C8CC')
           .onClick(() => {
@@ -271,7 +272,7 @@ struct ProvidersPage {
       if (this.testResult[config.providerId] !== undefined) {
         Text(this.testResult[config.providerId])
           .fontSize(11)
-          .fontColor(this.testOk(config.providerId) ? '#3BA55D' : '#E84026')
+          .fontColor(this.testOk(config.providerId) ? '#3BA55D' : '#F0523A')
           .width('100%')
       }
     }

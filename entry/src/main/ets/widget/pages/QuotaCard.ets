@@ -18,7 +18,7 @@ struct QuotaCard {
   @LocalStorageProp('headlineValue') headlineValue: string = '—';
   @LocalStorageProp('headlinePercent') headlinePercent: number = 0;
   @LocalStorageProp('headlineReset') headlineReset: string = '';
-  @LocalStorageProp('headlineColor') headlineColor: string = '#6B6B70';
+  @LocalStorageProp('headlineColor') headlineColor: string = '#9A9A9E';
   @LocalStorageProp('rowCount') rowCount: number = 0;
   @LocalStorageProp('row1') row1: string = '';
   @LocalStorageProp('row2') row2: string = '';
@@ -44,7 +44,7 @@ struct QuotaCard {
             .maxLines(1)
           Text(this.headlineReset)
             .fontSize(10)
-            .fontColor('#6B6B70')
+            .fontColor('#9A9A9E')
             .maxLines(1)
         }
         .alignItems(HorizontalAlign.Start)
@@ -73,14 +73,14 @@ struct QuotaCard {
 
       Row() {
         Text(this.balanceText)
-          .fontSize(9)
+          .fontSize(10)
           .fontColor('#8A8A8E')
           .layoutWeight(1)
           .maxLines(1)
           .textOverflow({ overflow: TextOverflow.Ellipsis })
         Text(this.updatedText)
-          .fontSize(9)
-          .fontColor('#5C5C60')
+          .fontSize(10)
+          .fontColor('#8A8A8E')
       }
       .width('100%')
       .margin({ top: 6 })

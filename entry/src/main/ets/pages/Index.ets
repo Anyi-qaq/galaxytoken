@@ -5,7 +5,8 @@ import {
   DashboardSnapshot,
   FetchState,
   ProviderConfig,
-  ProviderSnapshot
+  ProviderSnapshot,
+  windowLabel
 } from '../model/Types';
 import { ProviderRegistry } from '../sources/ProviderRegistry';
 import { QuotaService } from '../service/QuotaService';
@@ -135,7 +136,7 @@ struct Index {
           .fontColor('#F5F5F7')
         Text(this.subtitleText())
           .fontSize(11)
-          .fontColor('#6B6B70')
+          .fontColor('#9A9A9E')
       }
       .alignItems(HorizontalAlign.Start)
       .layoutWeight(1)
@@ -143,7 +144,7 @@ struct Index {
       if (!this.metrics.sideNav) {
         Button('来源')
           .fontSize(13)
-          .height(32)
+          .height(36)
           .backgroundColor('#242428')
           .fontColor('#D8D8DC')
           .onClick(() => {
@@ -151,7 +152,7 @@ struct Index {
           })
         Button('设置')
           .fontSize(13)
-          .height(32)
+          .height(36)
           .margin({ left: 8 })
           .backgroundColor('#242428')
           .fontColor('#D8D8DC')
@@ -172,8 +173,8 @@ struct Index {
   @Builder
   loadingView() {
     Column() {
-      LoadingProgress().width(36).height(36).color('#6B6B70')
-      Text('正在读取来源配置…').fontSize(12).fontColor('#6B6B70').margin({ top: 10 })
+      LoadingProgress().width(36).height(36).color('#9A9A9E')
+      Text('正在读取来源配置…').fontSize(12).fontColor('#9A9A9E').margin({ top: 10 })
     }
     .width('100%')
     .layoutWeight(1)
@@ -183,8 +184,8 @@ struct Index {
   @Builder
   errorView() {
     Column({ space: 10 }) {
-      Text('初始化失败').fontSize(15).fontColor('#E84026')
-      Text(this.errorText).fontSize(12).fontColor('#A05A50').textAlign(TextAlign.Center)
+      Text('初始化失败').fontSize(15).fontColor('#F0523A')
+      Text(this.errorText).fontSize(12).fontColor('#C08B82').textAlign(TextAlign.Center)
       Button('重新加载')
         .fontSize(13)
         .backgroundColor('#2A2A2E')
@@ -208,12 +209,12 @@ struct Index {
       Text('还没有启用的来源').fontSize(15).fontColor('#C8C8CC')
       Text('去「来源」里打开至少一个数据源；想先看效果可以启用「演示数据」。')
         .fontSize(12)
-        .fontColor('#6B6B70')
+        .fontColor('#9A9A9E')
         .textAlign(TextAlign.Center)
       Row({ space: 10 }) {
         Button('选择来源')
           .fontSize(13)
-          .backgroundColor('#3478F6')
+          .backgroundColor('#2D66D8')
           .fontColor('#FFFFFF')
           .onClick(() => {
             this.openPage('pages/ProvidersPage');
@@ -238,10 +239,11 @@ struct Index {
     Refresh({ refreshing: $$this.refreshing }) {
       Scroll() {
         Column({ space: this.metrics.cardGap }) {
+          this.tightestBanner()
           this.grid()
           Text(`共 ${this.activeSnapshots().length} 个来源 · ${relativeTime(this.refreshedAt(), this.now)}`)
             .fontSize(11)
-            .fontColor('#5C5C60')
+            .fontColor('#8A8A8E')
             .width('100%')
             .textAlign(TextAlign.Center)
             .padding({ top: 8, bottom: 24 })
@@ -262,6 +264,38 @@ struct Index {
     })
     .width('100%')
     .layoutWeight(1)
+  }
+
+  /**
+   * 最紧张额度摘要条。
+   *
+   * 聚合结果里已经有「剩余最少」的来源，但之前只喂给了桌面卡片；
+   * 放在卡片网格上方，让用户不进详情也能一眼看到风险点。
+   */
+  @Builder
+  tightestBanner() {
+    if (this.tightestRemaining() >= 0) {
+      Row({ space: 8 }) {
+        Circle({ width: 6, height: 6 })
+          .fill(this.tightestColor())
+          .accessibilityLevel('no')
+        Text(`最紧张 · ${this.tightestTitle()}`)
+          .fontSize(11)
+          .fontColor('#9A9A9E')
+          .layoutWeight(1)
+          .maxLines(1)
+          .textOverflow({ overflow: TextOverflow.Ellipsis })
+        Text(`剩余 ${Math.round(this.tightestRemaining() * 100)}%`)
+          .fontSize(12)
+          .fontWeight(FontWeight.Medium)
+          .fontColor(this.tightestColor())
+      }
+      .width('100%')
+      .padding({ left: 12, right: 12, top: 9, bottom: 9 })
+      .backgroundColor('#1C1C1F')
+      .borderRadius(10)
+      .border({ width: 1, color: '#2C2C30' })
+    }
   }
 
   /**
@@ -536,6 +570,41 @@ struct Index {
       return `${total} 个来源 · ${failed} 个异常 · 每 ${interval} 刷新`;
     }
     return `${total} 个来源 · 每 ${interval} 刷新`;
+  }
+
+  /** 最紧张窗口的剩余比例；没有数据时返回 -1。 */
+  private tightestRemaining(): number {
+    const dashboard = this.dashboard;
+    if (dashboard === undefined || dashboard.tightestProviderId === undefined ||
+      dashboard.tightestUsedRatio === undefined) {
+      return -1;
+    }
+    return Math.max(0, Math.min(1, 1 - dashboard.tightestUsedRatio));
+  }
+
+  /** 摘要条里的「来源 · 窗口」。 */
+  private tightestTitle(): string {
+    const dashboard = this.dashboard;
+    if (dashboard === undefined || dashboard.tightestProviderId === undefined) {
+      return '';
+    }
+    const id = dashboard.tightestProviderId;
+    const provider = this.activeSnapshots().find((p: ProviderSnapshot) => p.providerId === id);
+    const name = provider === undefined ? id : provider.name;
+    const kind = dashboard.tightestKind;
+    return kind === undefined ? name : `${name} · ${windowLabel(kind)}`;
+  }
+
+  /** 与进度条同一套阈值：剩余 ≤10% 红、≤30% 琥珀、其余绿。 */
+  private tightestColor(): string {
+    const remaining = this.tightestRemaining();
+    if (remaining <= 0.1) {
+      return '#F0523A';
+    }
+    if (remaining <= 0.3) {
+      return '#F2A33C';
+    }
+    return '#3BA55D';
   }
 
   /** 侧边导航选择。 */

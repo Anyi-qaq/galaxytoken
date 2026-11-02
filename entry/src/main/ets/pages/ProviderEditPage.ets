@@ -93,7 +93,7 @@ struct ProviderEditPage {
       this.header()
       if (this.config === undefined || this.descriptor === undefined) {
         Column() {
-          LoadingProgress().width(30).height(30).color('#6B6B70')
+          LoadingProgress().width(30).height(30).color('#9A9A9E')
         }
         .width('100%')
         .layoutWeight(1)
@@ -121,7 +121,7 @@ struct ProviderEditPage {
     Row({ space: 10 }) {
       Button('返回')
         .fontSize(13)
-        .height(32)
+        .height(36)
         .backgroundColor('#242428')
         .fontColor('#D8D8DC')
         .onClick(() => {
@@ -136,9 +136,9 @@ struct ProviderEditPage {
         .textOverflow({ overflow: TextOverflow.Ellipsis })
       Button(this.saving ? '保存中…' : '保存')
         .fontSize(13)
-        .height(32)
-        .backgroundColor('#3478F6')
-        .fontColor('#FFFFFF')
+        .height(36)
+        .backgroundColor('#242428')
+        .fontColor('#E8E8EA')
         .enabled(!this.saving)
         .onClick(() => {
           this.save(false);
@@ -169,7 +169,7 @@ struct ProviderEditPage {
         if (this.message !== '') {
           Text(this.message)
             .fontSize(12)
-            .fontColor(this.messageOk ? '#3BA55D' : '#E84026')
+            .fontColor(this.messageOk ? '#3BA55D' : '#F0523A')
             .width('100%')
         }
         if (this.rawPreview !== '' || this.rawPreviewError !== '') {
@@ -203,7 +203,7 @@ struct ProviderEditPage {
       .width('100%')
       Text(descriptor.apiNote)
         .fontSize(11)
-        .fontColor('#5C5C60')
+        .fontColor('#8A8A8E')
         .width('100%')
       if (descriptor.experimental) {
         Text('接口未公开或未在真实账号验证，可能随时失效。')
@@ -228,8 +228,8 @@ struct ProviderEditPage {
   supportChip(label: string, supported: boolean) {
     Text(supported ? label : `${label} 不支持`)
       .fontSize(10)
-      .fontColor(supported ? '#3BA55D' : '#6B6B70')
-      .backgroundColor(supported ? '#14351F' : '#242428')
+      .fontColor(supported ? '#3BA55D' : '#9A9A9E')
+      .backgroundColor(supported ? '#0E2617' : '#242428')
       .padding({ left: 8, right: 8, top: 3, bottom: 3 })
       .borderRadius(8)
   }
@@ -248,7 +248,7 @@ struct ProviderEditPage {
       } else {
         Text('该来源无需凭据。')
           .fontSize(12)
-          .fontColor('#6B6B70')
+          .fontColor('#9A9A9E')
           .width('100%')
       }
 
@@ -264,7 +264,7 @@ struct ProviderEditPage {
             })
           Text('留空使用默认地址。')
             .fontSize(10)
-            .fontColor('#5C5C60')
+            .fontColor('#8A8A8E')
             .width('100%')
         }
         .width('100%')
@@ -282,7 +282,7 @@ struct ProviderEditPage {
       Row({ space: 4 }) {
         Text(field.label).fontSize(12).fontColor('#9A9A9E')
         if (field.required) {
-          Text('*').fontSize(12).fontColor('#E84026')
+          Text('*').fontSize(12).fontColor('#F0523A')
         }
       }
       .width('100%')
@@ -304,10 +304,11 @@ struct ProviderEditPage {
           ForEach(field.options ?? [], (option: string) => {
             Text(option)
               .fontSize(12)
+              .fontWeight(this.currentChoice(field) === option ? FontWeight.Medium : FontWeight.Normal)
               .fontColor(this.currentChoice(field) === option ? '#FFFFFF' : '#9A9A9E')
-              .backgroundColor(this.currentChoice(field) === option ? '#3478F6' : '#242428')
-              .padding({ left: 10, right: 10, top: 5, bottom: 5 })
-              .borderRadius(8)
+              .backgroundColor(this.currentChoice(field) === option ? '#2D66D8' : '#242428')
+              .padding({ left: 12, right: 12, top: 8, bottom: 8 })
+              .borderRadius(9)
               .onClick(() => {
                 this.plainValues[field.key] = option;
               })
@@ -330,7 +331,7 @@ struct ProviderEditPage {
       if (field.helpText !== undefined && field.helpText !== '') {
         Text(field.helpText)
           .fontSize(10)
-          .fontColor('#5C5C60')
+          .fontColor('#8A8A8E')
           .width('100%')
       }
     }
@@ -356,10 +357,11 @@ struct ProviderEditPage {
           ForEach(['GET', 'POST'], (method: string) => {
             Text(method)
               .fontSize(12)
+              .fontWeight(this.customMethod === method ? FontWeight.Medium : FontWeight.Normal)
               .fontColor(this.customMethod === method ? '#FFFFFF' : '#9A9A9E')
-              .backgroundColor(this.customMethod === method ? '#3478F6' : '#242428')
-              .padding({ left: 12, right: 12, top: 5, bottom: 5 })
-              .borderRadius(8)
+              .backgroundColor(this.customMethod === method ? '#2D66D8' : '#242428')
+              .padding({ left: 12, right: 12, top: 8, bottom: 8 })
+              .borderRadius(9)
               .onClick(() => {
                 this.customMethod = method;
               })
@@ -379,10 +381,11 @@ struct ProviderEditPage {
           ], (mode: Record<string, string>) => {
             Text(mode.label)
               .fontSize(12)
+              .fontWeight(this.customAuthMode === mode.key ? FontWeight.Medium : FontWeight.Normal)
               .fontColor(this.customAuthMode === mode.key ? '#FFFFFF' : '#9A9A9E')
-              .backgroundColor(this.customAuthMode === mode.key ? '#3478F6' : '#242428')
-              .padding({ left: 10, right: 10, top: 5, bottom: 5 })
-              .borderRadius(8)
+              .backgroundColor(this.customAuthMode === mode.key ? '#2D66D8' : '#242428')
+              .padding({ left: 12, right: 12, top: 8, bottom: 8 })
+              .borderRadius(9)
               .onClick(() => {
                 this.customAuthMode = mode.key;
               })
@@ -519,10 +522,11 @@ struct ProviderEditPage {
         ], (option: Record<string, string>) => {
           Text(option.label)
             .fontSize(11)
+            .fontWeight(semantics === option.key ? FontWeight.Medium : FontWeight.Normal)
             .fontColor(semantics === option.key ? '#FFFFFF' : '#9A9A9E')
-            .backgroundColor(semantics === option.key ? '#3478F6' : '#242428')
-            .padding({ left: 8, right: 8, top: 4, bottom: 4 })
-            .borderRadius(7)
+            .backgroundColor(semantics === option.key ? '#2D66D8' : '#242428')
+            .padding({ left: 10, right: 10, top: 7, bottom: 7 })
+            .borderRadius(8)
             .onClick(() => {
               onSemantics(option.key);
             })
@@ -575,7 +579,7 @@ struct ProviderEditPage {
         .width('100%')
         .fontSize(14)
         .height(42)
-        .backgroundColor('#3478F6')
+        .backgroundColor('#2D66D8')
         .fontColor('#FFFFFF')
         .enabled(!this.saving)
         .onClick(() => {
@@ -590,10 +594,10 @@ struct ProviderEditPage {
     Column({ space: 6 }) {
       Text(this.rawPreviewError !== '' ? '响应预览（失败）' : '响应预览（已脱敏）')
         .fontSize(12)
-        .fontColor(this.rawPreviewError !== '' ? '#E84026' : '#C8C8CC')
+        .fontColor(this.rawPreviewError !== '' ? '#F0523A' : '#C8C8CC')
         .width('100%')
       Text(this.rawPreviewError !== '' ? this.rawPreviewError : this.rawPreview)
-        .fontSize(10)
+        .fontSize(11)
         .fontColor('#8A8A8E')
         .width('100%')
         .maxLines(14)

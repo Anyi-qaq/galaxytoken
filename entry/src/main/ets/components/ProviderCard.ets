@@ -66,13 +66,13 @@ export struct ProviderCard {
 
       Row() {
         Text(relativeTime(this.snapshot.fetchedAt, this.now))
-          .fontSize(10)
-          .fontColor('#5C5C60')
+          .fontSize(11)
+          .fontColor('#8A8A8E')
           .layoutWeight(1)
         if (this.snapshot.elapsedMs !== undefined && this.snapshot.elapsedMs > 0) {
           Text(`${this.snapshot.elapsedMs} ms`)
-            .fontSize(10)
-            .fontColor('#5C5C60')
+            .fontSize(11)
+            .fontColor('#8A8A8E')
         }
       }
       .width('100%')
@@ -109,7 +109,7 @@ export struct ProviderCard {
             Text(moneyText(item.amount, item.currency, this.moneyDecimals))
               .fontSize(this.metrics.sizeClass === SizeClass.SM ? 18 : 20)
               .fontWeight(FontWeight.Medium)
-              .fontColor(item.amount < 0 ? '#E84026' : '#F2F2F4')
+              .fontColor(item.amount < 0 ? '#F0523A' : '#F2F2F4')
               .layoutWeight(1)
           }
           .width('100%')
@@ -117,13 +117,13 @@ export struct ProviderCard {
           if (item.note !== undefined && item.note !== '') {
             Text(item.note)
               .fontSize(11)
-              .fontColor(item.amount < 0 ? '#E84026' : '#8A8A8E')
+              .fontColor(item.amount < 0 ? '#F0523A' : '#8A8A8E')
               .width('100%')
           }
           if (item.granted !== undefined || item.toppedUp !== undefined) {
             Text(this.balanceDetail(item))
               .fontSize(11)
-              .fontColor('#6B6B6B')
+              .fontColor('#8A8A8E')
               .width('100%')
           }
         }, (item: BalanceInfo, index: number) => `${this.snapshot.providerId}-bal-${index}`)
@@ -178,7 +178,7 @@ export struct ProviderCard {
       Row({ space: 8 }) {
         Button('去配置')
           .fontSize(12)
-          .height(28)
+          .height(34)
           .backgroundColor('#2B4A7A')
           .fontColor('#DCE8FF')
           .onClick(() => {
@@ -186,7 +186,7 @@ export struct ProviderCard {
           })
         Button('重试')
           .fontSize(12)
-          .height(28)
+          .height(34)
           .backgroundColor('#2A2A2E')
           .fontColor('#8A8A8E')
           .onClick(() => {
@@ -204,19 +204,19 @@ export struct ProviderCard {
     Column({ space: 6 }) {
       Text(this.errorTitle())
         .fontSize(13)
-        .fontColor('#E84026')
+        .fontColor('#F0523A')
         .width('100%')
       if (this.errorDetail() !== '') {
         Text(this.errorDetail())
           .fontSize(11)
-          .fontColor('#A05A50')
+          .fontColor('#C08B82')
           .width('100%')
           .maxLines(4)
           .textOverflow({ overflow: TextOverflow.Ellipsis })
       }
       Button('重试')
         .fontSize(12)
-        .height(28)
+        .height(34)
         .backgroundColor('#2A2A2E')
         .fontColor('#E8E8EA')
         .onClick(() => {
@@ -282,20 +282,20 @@ export struct ProviderCard {
       case FetchState.NEEDS_AUTH:
         return '#7AA2F7';
       default:
-        return '#E84026';
+        return '#F0523A';
     }
   }
 
   private stateBg(): string {
     switch (this.snapshot.state) {
       case FetchState.OK:
-        return '#14351F';
+        return '#0E2617';
       case FetchState.PARTIAL:
         return '#3A2A12';
       case FetchState.NEEDS_AUTH:
         return '#17233A';
       default:
-        return '#3A1A16';
+        return '#2B0F0B';
     }
   }
 

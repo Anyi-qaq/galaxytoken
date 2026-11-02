@@ -39,8 +39,8 @@
 本项目调用的接口分三类，**可靠性依次递减**：
 
 1. **有官方文档的公开 API** — DeepSeek、Kimi、OpenRouter 等，相对稳定。
-2. **未公开但长期稳定的接口** — 各家 Coding Plan 的用量查询端点，官方没有对外承诺，随时可能变。
-3. **纯逆向出来的端点** — 从网页控制台抓包得到的，最脆弱。
+2. **有官方开源代码佐证的接口** — 智谱 GLM 的额度端点可从官方仓库 [zai-org/ZCode](https://github.com/zai-org/ZCode)（Apache-2.0）的生产代码中核实，字段语义有第一方注释背书。虽无网页文档，但可信度高。
+3. **仅靠实测推断的接口** — 没有官方文档也没有官方代码，靠长期观察确定语义，随时可能变。
 
 **本项目的立场**：
 
@@ -86,7 +86,7 @@
 | 来源 | 端点 | 备注 |
 |---|---|---|
 | Kimi Code | `GET /coding/v1/usages` | 新套餐已取消每周上限 |
-| 智谱 GLM Coding Plan | `GET /api/monitor/usage/quota/limit` | 鉴权不加 Bearer 前缀 |
+| 智谱 GLM Coding Plan | `GET /api/monitor/usage/quota/limit` | 5h/周/月三窗口，语义见 ZCode 官方源码 |
 | MiniMax M Plan | `GET /v1/token_plan/remains` | 业务错误可能藏在 HTTP 200 里 |
 
 另有**演示数据**（内置、不联网）与**自定义来源**。

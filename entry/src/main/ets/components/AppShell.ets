@@ -36,10 +36,11 @@ export struct SideNav {
           .height(30)
           .borderRadius(9)
           .textAlign(TextAlign.Center)
+          .accessibilityLevel('no')
         Text('星河 Token')
           .fontSize(14)
           .fontWeight(FontWeight.Medium)
-          .fontColor('#F0F0F2')
+          .fontColor('#F2F2F4')
           .layoutWeight(1)
           .maxLines(1)
           .textOverflow({ overflow: TextOverflow.Ellipsis })
@@ -54,6 +55,7 @@ export struct SideNav {
             .fontColor(this.current === item.key ? '#FFFFFF' : '#8A8A8E')
             .width(18)
             .textAlign(TextAlign.Center)
+            .accessibilityLevel('no')
           Text(item.label)
             .fontSize(13)
             .fontColor(this.current === item.key ? '#FFFFFF' : '#A8A8AC')
@@ -64,6 +66,10 @@ export struct SideNav {
         .padding({ left: 10, right: 10 })
         .borderRadius(10)
         .backgroundColor(this.current === item.key ? '#2C2C31' : '#00000000')
+        .focusable(true)
+        .hoverEffect(HoverEffect.Highlight)
+        .accessibilityLevel('yes')
+        .accessibilityText(this.current === item.key ? `${item.label}，当前页面` : item.label)
         .onClick(() => {
           this.onSelect(item.key);
         })
@@ -73,7 +79,7 @@ export struct SideNav {
 
       Text(this.hint())
         .fontSize(10)
-        .fontColor('#4E4E52')
+        .fontColor('#8A8A8E')
         .width('100%')
         .padding({ left: 8, right: 8, bottom: 10 })
     }
@@ -107,7 +113,7 @@ export struct ContentShell {
       Column() {
         this.content()
       }
-      .width(this.metrics.maxContentWidth > 0 ? '100%' : '100%')
+      .width('100%')
       .constraintSize({ maxWidth: this.metrics.maxContentWidth > 0 ? this.metrics.maxContentWidth : 99999 })
       .padding({ left: this.metrics.pagePadding, right: this.metrics.pagePadding })
     }
