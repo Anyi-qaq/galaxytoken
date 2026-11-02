@@ -2,6 +2,12 @@
 
 一个跑在 HarmonyOS 上的小工具：把各家 AI 大模型的**订阅套餐额度**和**按量付费余额**汇总到一屏，顺带提供一张桌面服务卡片。
 
+<div align="center">
+
+[![](https://img.shields.io/badge/powered_by-dsh-4D6BFE?style=flat-square&logo=deepseek&logoColor=white)](https://github.com/deepseek-ai/deepseek-harness)
+
+</div>
+
 ---
 
 ## ⚠️ 先叠甲：这是「许愿式编程」的产物
@@ -201,5 +207,3 @@ cp build-profile.example.json5 build-profile.json5
 ## License
 
 [MIT](LICENSE)
-
-[![](https://img.shields.io/badge/powered_by-dsh-4D6BFE?style=flat-square&logo=deepseek&logoColor=white)](https://github.com/deepseek-ai/deepseek-harness)
