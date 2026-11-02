@@ -1,0 +1,10 @@
+{
+  "modelVersion": "26.0.0",
+  "description": "星河 Token：在鸿蒙上查看各家 AI 大模型的订阅额度与按量付费余额。",
+  "dependencies": {
+  },
+  "devDependencies": {
+    "@ohos/hypium": "1.0.25",
+    "@ohos/hamock": "1.0.0"
+  }
+}

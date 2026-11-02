@@ -1,0 +1,8 @@
+{
+  "src": [
+    "pages/Index",
+    "pages/ProvidersPage",
+    "pages/ProviderEditPage",
+    "pages/SettingsPage"
+  ]
+}

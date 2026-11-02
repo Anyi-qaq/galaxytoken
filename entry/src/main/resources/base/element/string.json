@@ -1,0 +1,28 @@
+{
+  "string": [
+    {
+      "name": "module_desc",
+      "value": "星河 Token：多来源 AI 额度看板"
+    },
+    {
+      "name": "EntryAbility_desc",
+      "value": "星河 Token 主界面"
+    },
+    {
+      "name": "EntryAbility_label",
+      "value": "星河 Token"
+    },
+    {
+      "name": "form_label",
+      "value": "额度卡片"
+    },
+    {
+      "name": "form_desc",
+      "value": "显示最紧张的 AI 额度窗口与重置倒计时"
+    },
+    {
+      "name": "form_display_name",
+      "value": "星河额度"
+    }
+  ]
+}

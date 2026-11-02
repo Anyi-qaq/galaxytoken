@@ -1,0 +1,45 @@
+{
+  app: {
+    // 签名材料属于本机环境，不入库。
+    // 首次使用请在 DevEco Studio 的 File → Project Structure → Signing Configs
+    // 里勾选 “Automatically generate signature”，工具会自动补全这一段。
+    // 也可以手动填写，然后另存为 build-profile.json5（该文件已被 git 忽略）。
+    products: [
+      {
+        name: 'default',
+        // signingConfig: 'default',
+        targetSdkVersion: '26.0.0',
+        compatibleSdkVersion: '5.1.1(19)',
+        runtimeOS: 'HarmonyOS',
+        buildOption: {
+          strictMode: {
+            caseSensitiveCheck: true,
+            useNormalizedOHMUrl: true,
+          },
+        },
+      },
+    ],
+    buildModeSet: [
+      {
+        name: 'debug',
+      },
+      {
+        name: 'release',
+      },
+    ],
+  },
+  modules: [
+    {
+      name: 'entry',
+      srcPath: './entry',
+      targets: [
+        {
+          name: 'default',
+          applyToProducts: [
+            'default',
+          ],
+        },
+      ],
+    },
+  ],
+}

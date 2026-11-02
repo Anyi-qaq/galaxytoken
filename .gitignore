@@ -1,0 +1,21 @@
+/node_modules
+/oh_modules
+/local.properties
+/.idea
+**/build
+/.hvigor
+.cxx
+/.clangd
+/.clang-format
+/.clang-tidy
+**/.test
+/.appanalyzer
+# 本机签名材料与绝对路径，不入库
+/build-profile.local.json5
+
+# 构建缓存
+/.cache
+/build-profile.json5
+
+# 截图（调试过程产物，不入库）
+/screenshots
