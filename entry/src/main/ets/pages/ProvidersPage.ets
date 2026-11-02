@@ -27,6 +27,20 @@ struct ProvidersPage {
   @State metrics: LayoutMetrics = metricsFor(SizeClass.SM);
   private unwatchSize: (() => void) | undefined = undefined;
 
+  /**
+   * 拦截系统返回键 / 侧滑返回。
+   *
+   * 顶级页面之间用 replaceUrl 互切，页面栈里只有当前页，系统返回会直接退出
+   * 应用。这里改成回总览，符合「按返回是退一层，不是退出去」的直觉。
+   * 返回 true 表示已消费该事件。
+   */
+  onBackPress(): boolean {
+    router.replaceUrl({ url: 'pages/Index' }).catch((error: Object) => {
+      Log.w(`back to index failed: ${error}`);
+    });
+    return true;
+  }
+
   aboutToAppear(): void {
     this.load();
     try {
