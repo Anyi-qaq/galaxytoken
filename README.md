@@ -193,7 +193,7 @@ cp build-profile.example.json5 build-profile.json5
 
 ## 致谢
 
-- 接口清单与实现细节大量参考了 [cc-switch](https://github.com/farion1231/cc-switch) 的 `services/balance.rs` 与 `services/coding_plan.rs`。
+- 各家接口的清单与字段语义参考了 [cc-switch](https://github.com/farion1231/cc-switch) 的 `services/balance.rs` 与 `services/coding_plan.rs`（MIT）。本项目未包含其源代码，实现为独立重写。
 - 图标由 gpt-image 生成。
 
 ---
