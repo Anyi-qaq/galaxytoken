@@ -53,8 +53,11 @@ struct ProvidersPage {
           current: 'providers',
           metrics: this.metrics,
           onSelect: (key: string) => {
+            // 顶级页面之间一律 replaceUrl：动画一致，且不会堆出多余的返回栈。
             if (key === 'index') {
-              router.back();
+              router.replaceUrl({ url: 'pages/Index' }).catch((error: Object) => {
+                Log.w(`nav index failed: ${error}`);
+              });
             } else if (key === 'settings') {
               router.replaceUrl({ url: 'pages/SettingsPage' }).catch((error: Object) => {
                 Log.w(`nav settings failed: ${error}`);
@@ -469,7 +472,32 @@ struct ProvidersPage {
     await SecretStore.remove(providerId);
   }
 
+  /**
+   * 窄屏「返回」回总览。
+   *
+   * 顶级页面之间用 replaceUrl 切换，页面栈里没有上一页可 back，所以这里必须
+   * 显式 replace 回首页，否则返回按钮点了没反应。
+   */
   private goBack(): void {
-    router.back();
+    router.replaceUrl({ url: 'pages/Index' }).catch((error: Object) => {
+      Log.w(`nav index failed: ${error}`);
+    });
   }
+
+  /**
+   * 顶级页面统一转场。
+   *
+   * 总览 / 来源 / 设置三者是平级关系，一律用 replaceUrl 互切，所以只需要一套
+   * 淡入淡出：不区分 Push/Pop，也就不存在「从哪里来回哪里去」的方向差异。
+   * 幅度刻意做小（位移 8vp、时长 180ms），避免每次切导航都像翻页一样晃眼。
+   */
+  pageTransition() {
+    PageTransitionEnter({ duration: 180, curve: Curve.EaseOut })
+      .opacity(0)
+      .translate({ x: 8 })
+    PageTransitionExit({ duration: 180, curve: Curve.EaseIn })
+      .opacity(0)
+      .translate({ x: -8 })
+  }
+
 }

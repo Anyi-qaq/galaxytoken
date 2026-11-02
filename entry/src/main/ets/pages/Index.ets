@@ -560,9 +560,34 @@ struct Index {
       });
   }
 
+  /**
+   * 跳转到另一个顶级页面。
+   *
+   * 三个顶级页面（总览 / 来源 / 设置）之间是平级关系，用 replaceUrl 而不是
+   * pushUrl，页面栈里始终只有一个顶级页：
+   *   - 三者之间的转场动画完全一致（都是 Replace，走同一套 pageTransition）
+   *   - 不会出现「设置 → 返回 → 却回到来源」这种回退错位
+   */
   private openPage(url: string): void {
-    router.pushUrl({ url: url }).catch((error: Object) => {
+    router.replaceUrl({ url: url }).catch((error: Object) => {
       Log.w(`open page failed: ${error}`);
     });
   }
+
+  /**
+   * 顶级页面统一转场。
+   *
+   * 总览 / 来源 / 设置三者是平级关系，一律用 replaceUrl 互切，所以只需要一套
+   * 淡入淡出：不区分 Push/Pop，也就不存在「从哪里来回哪里去」的方向差异。
+   * 幅度刻意做小（位移 8vp、时长 180ms），避免每次切导航都像翻页一样晃眼。
+   */
+  pageTransition() {
+    PageTransitionEnter({ duration: 180, curve: Curve.EaseOut })
+      .opacity(0)
+      .translate({ x: 8 })
+    PageTransitionExit({ duration: 180, curve: Curve.EaseIn })
+      .opacity(0)
+      .translate({ x: -8 })
+  }
+
 }
